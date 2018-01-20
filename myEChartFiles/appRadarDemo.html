@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<script src="echarts.min.js"></script>
+		<script src="jquery.min.js"></script>
+
+		<style>
+			table {
+				font-size: 16px;
+				text-align: center;
+				margin: auto;
+				border-collapse: separate;
+				border-spacing: 0;
+				border: 1px #3bb0fc;
+			}
+			
+			table tr {
+				border-bottom-color: #000000;
+				border-top-color: #000000;
+				border-left-color: #000000;
+				border-right-color: #000000;
+			}
+		</style>
+
+		<title></title>
+		
+		
+		
+		
+	</head>
+
+	<body style="position: relative;">
+		<table border="1.0" cellspacing="0" width="100%">
+			<tr>
+				<td style="text-align: center;" onclick="initializeDataSource(0)">日报</td>
+				<td style="text-align: center;" onclick="initializeDataSource(1)">周报</td>
+				<td style="text-align: center;" onclick="initializeDataSource(2)">月报</td>
+			</tr>
+
+		</table>
+
+		<!--
+        	作者：1251748896@qq.com
+        	时间：2017-11-30
+        	描述：-- 为 ECharts 准备一个具备大小（宽高）的 DOM
+        	table 高度 ： 50
+        	雷达表的高度 ： 400
+        	柱形图的高度： 600
+        	
+        -->
+		<div id="radarChartDiv" style="width: 100%; height: 400px; overflow: hidden; position: absolute;top: 100px; color: red;"></div>
+		<br />
+		<br />
+		<div id="columnChartDiv" style="width: 100%; height: 600px; overflow: hidden; position: absolute;top: 550px; color: red;"></div>
+		<p style="border: silver;color: black;border-bottom: 1px solid #000000;position: absolute;top: 500px; width: 100%;">设备报警数据详情：</p>
+		<br />
+		<script type="text/javascript">
+			
+			var xhsColumnChart = echarts.init(document.getElementById('columnChartDiv'));
+			
+			var option = {
+				title: {
+					text: '世界人口总量',
+					subtext: '数据来自网络'
+				},
+				tooltip: {
+					trigger: 'axis'
+				},
+				legend: {
+					data: ['2011年', '2012年']
+				},
+				toolbox: {
+					show: true,
+					feature: {
+						mark: {
+							show: true
+						},
+						dataView: {
+							show: true,
+							readOnly: false
+						},
+						magicType: {
+							show: true,
+							type: ['line', 'bar']
+						},
+						restore: {
+							show: true
+						},
+						saveAsImage: {
+							show: true
+						}
+					}
+				},
+				calculable: true,
+				xAxis: [{
+					type: 'value',
+					boundaryGap: [0, 0.01]
+				}],
+				yAxis: [{
+					type: 'category',
+					data: ['巴西', '印尼', '美国', '印度', '中国', '世界人口(万)']
+				}],
+				series: [{
+						name: '2011年',
+						type: 'bar',
+						data: [18203, 23489, 29034, 104970, 131744, 630230]
+					},
+					{
+						name: '2012年',
+						type: 'bar',
+						data: [19325, 23438, 31000, 121594, 134141, 681807]
+					}
+				]
+			};
+			
+			xhsColumnChart.setOption(option);
+			
+		</script>
+
+		<script type="text/javascript">
+			/*
+			 * 1.请求token
+			 * 2.请求区域
+			 * 3.利用区域参数，去获取数据报表
+			 * 
+			 * */
+			//1.token
+			//var baseUrl = "http://183.220.115.100:8088/";
+			var baseUrl = "http://192.168.4.95:8088/";
+			var appToken = "";
+			var loginUrl = "api/user/login";
+			var loginParam = "?mobile=15982285748" + "&" + "password=123456";
+			$.ajax({
+				type: "post",
+				url: baseUrl + loginUrl + loginParam,
+				async: false,
+				success: function(res) {
+					console.log(res);
+					appToken = res.results.token;
+				}
+			});
+			//2.区域
+			var areasParam = "?token="+appToken;
+			var areasUrl = baseUrl + "api/device/areas"+areasParam;
+			var areasArr = [];
+			$.ajax({
+				type:"get",
+				url:areasUrl,
+				async:false,
+				success: function(res) {
+					console.log(res);
+				},
+				error: function(err) {
+					 
+				}
+			});
+			
+			//请求报表
+			var xhsRadarChart = echarts.init(document.getElementById('radarChartDiv'));
+			function initializeDataSource(indx) {
+				console.log(indx);
+				//获取数据
+				var myUrl = "api/device/reports";
+				var param = "?token=" + appToken;
+				var requestUrl = baseUrl + myUrl + param;
+				console.log(requestUrl);
+				$.ajax({
+					type: "GET",
+					url: requestUrl,
+					dataType: "json",
+					async: true,
+					success: function(resultss) {
+						var dataArray = resultss.results.regInfo;
+						var valuesArray = [];
+						var indicatorArray = [];
+						var maxNum = 0;
+						for(var tempIndx in dataArray) {
+							var dic = dataArray[tempIndx];
+							var tempDic = {};
+							if(maxNum < dic.msgCount) {
+								maxNum = dic.msgCount;
+							}
+							tempDic["text"] = dic.mappingName;
+							tempDic["max"] = maxNum;
+							valuesArray.push(dic.msgCount);
+							indicatorArray.push(tempDic);
+						}
+						if(indx == 0) {
+							console.log("index = 0");
+							valuesArray = [297, 102, 274, 105, 288, 102];
+						} else if(indx == 1) {
+							console.log("index = 1");
+						}
+						option = {
+							title: {
+								text: '',
+								subtext: ''
+							},
+							tooltip: {
+								trigger: 'axis'
+							},
+							legend: {
+								x: 'center',
+								data: ['罗纳尔多', '舍普琴科']
+							},
+							toolbox: {
+								show: true,
+								feature: {
+									mark: {
+										show: true
+									},
+									dataView: {
+										show: true,
+										readOnly: false
+									},
+									restore: {
+										show: true
+									},
+									saveAsImage: {
+										show: true
+									}
+								}
+							},
+							calculable: true,
+							polar: [{
+								indicator: indicatorArray,
+								radius: 130
+							}],
+							series: [{
+								name: '完全实况球员数据',
+								type: 'radar',
+								itemStyle: {
+									normal: {
+										areaStyle: {
+											type: 'default'
+										}
+									}
+								},
+								data: [{
+										value: valuesArray,
+										name: '昨天'
+									},
+									{
+										value: [197, 132, 174, 195, 188, 192],
+										name: '今天'
+									}
+								]
+							}]
+						}; //option 设置结束
+
+						xhsRadarChart.setOption(option);
+
+					},
+
+					error: function(err) {
+						console.log(err);
+					}
+
+				})
+
+			}
+		</script>
+
+	</body>
+
+</html>

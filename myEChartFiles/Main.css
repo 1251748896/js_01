@@ -1,0 +1,191 @@
+
+* {
+	font-family: arial;
+	margin: 0px;
+	padding: 0px;
+	top: 0px;
+}
+
+a {
+	text-decoration: none;
+}
+
+/*banner*/
+
+#banner {
+	width: 200%;
+	height: 220px;
+}
+
+#banner .bg_div {
+	width: 50%;
+	height: 220px;
+	float: left;
+	position: relative;
+}
+
+#banner .bg_div .bg_img_1 {
+	width: 100%;
+	height: 220px;
+	position: absolute;
+	z-index: -5;
+}
+
+#banner .bg_div #top_title {
+	width: 100%;
+	color: white;
+	top: 10px;
+	position: relative;
+	text-align: center;
+}
+
+#banner .bg_div #top_left {
+	width: 45%;
+	text-align: center;
+	position: relative;
+	margin-top: 40px;
+	float: left;
+}
+
+#online_left, #offline_left {
+	margin-top: 25px;
+}
+
+#main_chart_circle {
+	width: 50%;
+	height: 150px;
+	position: relative;
+	background-color: red;
+	margin-top: 20px;
+	float: left;
+}
+
+#notice_shadow {
+	background-color: rgba(0,0,0,0.1);
+	margin: 12px 10px 12px 10px;
+	height: 200px;
+	position: relative;
+}
+
+#notice_shadow #notice_title {
+	margin-top: 10px;
+	color: white;
+	text-align: center;
+}
+
+#notice_shadow #niotice_content {
+	color: white;
+	width: 100%;
+	height: 160px;
+	margin: 0px 10px;
+}
+
+#notice_shadow #notice_time {
+	color: white;
+	float: right;
+	margin: 0px 10px;
+	background-color: red;
+}
+
+/*灰色线*/
+.gayLine_10 {
+	width: 100%;
+	height: 10px;
+	background-color: #F5F5F5;
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+}
+
+
+/*系统*/
+
+#system_bg_div {
+	width: 100%;
+	font-size: 13px;
+	text-align: center;
+/*	height: 376px;*/
+}
+
+/*system_item_div 实际是一个a标签*/
+#system_bg_div .system_item_div {
+	width: 185px;
+	height: 185px;
+	display: -webkit-flex;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	float: left;
+	border-bottom: 1px solid #F5F5F5;
+	border-right: 1px solid #F5F5F5;
+	text-decoration: none;
+	color: #333333;
+}
+
+#system_bg_div .system_item_div img {
+	margin-bottom: 15px;
+}
+
+/*底部的消息列表*/
+
+ul {
+	list-style: none;
+	width: 100%;
+	background-color: white;
+}
+
+#message_list_header {
+	width: 100%;
+	height: 44px;
+	background-color: #E7E7E7;
+}
+
+#messahe_header_left {
+	margin-left: 10px;
+	color: #333333;
+	font-size: 16px;
+	line-height: 44px;
+}
+
+#messahe_header_right {
+	margin-right: 10px;
+	color: #666666;
+	font-size: 15px;
+	float: right;
+	line-height: 44px;
+}
+
+li {
+	border-bottom: 5px solid #F5F5F5;
+}
+
+li div {
+	line-height: 32px;
+	color: #666666;
+	font-size: 15px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+.message_time {
+	color: #999999;
+	font-size: 13px;
+	float: right;
+}
+
+.main_cell_fault a .cell_bottom .alert_type_color {
+	background-color: #FB2929;
+	border-radius: 10%;
+	color: white;
+	padding: 1px 3px;
+}
+
+.main_cell_alarm a .cell_bottom .alert_type_color {
+	background-color: #FB8229;
+	border-radius: 10%;
+	color: white;
+	padding: 1px 3px;
+}
+
+

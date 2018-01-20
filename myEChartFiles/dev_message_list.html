@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>消息列表</title>
+		<script src="jquery.min.js"></script>
+
+		<style type="text/css">
+			* {
+				/*margin: 0px;*/
+				padding: 0px;
+				font-family: arial;
+			}
+			
+			ul {
+				list-style: none;
+				width: 100%;
+			}
+			
+			.aramType {
+				margin-left: 0px;
+				padding-left: 0px;
+				float: left;
+				display: inline-block;
+				width: 50px;
+				height: 50px;
+				background-color: red;
+				border-radius: 50%;
+				position: relative;
+			}
+			
+			.aramType p {
+				color: #fff;
+				font-size: 14px;
+				position: relative;
+				text-align: center;
+			}
+			
+			.itemInfo {
+				float: left;
+				margin-left: 10px;
+				font-size: 15px;
+				color: #666666;
+			}
+			
+			.more_more {
+				float: right;
+				color: #B3B3B3;
+			}
+			.more_more img {
+				float: right;
+			}
+			
+			li {
+				clear: both;
+				/*border-bottom: 1px solid #e7e7e7;*/
+				/*一下两个样式,完成了li之间的间距设置问题*/
+				margin-top: 10px;
+				height: 70px;
+			}
+			
+			.linkLabel:link {
+				display: block;
+				color: #333333;
+				border-bottom: 1px solid #e7e7e7;
+			}
+			
+			.linkLabel:active {
+				background-color: #e7e7e7;
+				color: purple;
+			}
+			
+			#baojing {
+				color: #FB2929;
+			}
+			
+			#guzhang {
+				color: #FB8229;
+			}
+			
+			#jiance_value_baojing {
+				color: #FB2929;
+				margin-left: 25px;
+			}
+			
+			#jiance_value_guzhang {
+				color: #FB8229;
+				margin-left: 25px;
+			}
+			
+			#baojing_before {
+				background-color: #FB2929;
+			}
+			
+			#guzhang_before {
+				background-color: #FB8229;
+			}
+			
+			.loadNextPage {
+				display: block;
+				height: 44px;
+				width: 100%;
+				background-color: #f5f5f5;
+				border-style: none;
+				font-size: 15px;
+				line-height: 44px;
+				text-align: center;
+				color: #999999;
+				margin: 0px;
+				padding: 0px;
+			}
+			.loadNextPage:active {
+				background-color: lightgray;
+				color: #999999;
+			}
+			
+			
+			
+		</style>
+
+	</head>
+
+	<body>
+		
+		<ul id="list">
+
+			<a href="#" class="linkLabel">
+
+				<li>
+					<div class="aramType" id="baojing_before"></div>
+					<div class="aramType" id="guzhang_before"></div>
+
+					<div class="itemInfo">
+						<div>设备类型:XXXXX</div>
+						<div>报警类型:
+							<span id="baojing"></span>
+							<span id="guzhang"></span>
+							<span id="jiance_value_baojing"></span>
+							<span id="jiance_value_guzhang"></span>
+						</div>
+						<div>项目归属:XXXXX</div>
+					</div>
+					<div class="more_more">
+						<div class="tm">刚刚</div>
+						<div>
+							<img src="../img/more.png" />
+						</div>
+					</div>
+				</li>
+			</a>
+		</ul>
+		
+		
+		<a class="loadNextPage" onclick="dataSource()">加载更多</a>
+		
+		<!--<button class="loadNextPage" onclick="dataSource()">加载更多</button>-->
+
+		<script type="text/javascript">
+			//全局变量
+			/**防止多次点击'加载更多'，导致数据错误*/
+			var requesting = false;
+			
+			var currentPage = 1;
+			var pageSize = 20;
+			var listDataArr = new Array();
+
+			var docList = document.getElementById('list');
+			var docStr = '';
+
+			var baseUrl = "http://183.220.115.100:8888/";
+			var messageUrl = "api/siteGis/sensorsEvents";
+			var lastId = "";
+			var userToken = "82d3eb1c-3fba-457a-8446-de9d4c3ddae8";
+			messageUrl = baseUrl + messageUrl + "?pageSize=" + pageSize + "&lastId={{page}}" + "&status=1&eventType=1,2&token=" + userToken;
+
+			function formatDateTime(timeStamp, showType) {
+				/*
+				 * 时间是：24小时🈯制的时间 
+				 * showType : 0----> yyyy-MM-dd HH:mm:ss
+				 * showType : 1----> HH:mm:ss
+				 * showType : 2----> yyyy-MM-dd
+				 * showType : 3----> MM-dd
+				 * showType : 4----> dd
+				 * showType : 5----> MM-dd hh:mm
+				 * showType : 6----> hh:mm
+				 * showType : 7----> hh
+				 */
+				var date = new Date();
+				date.setTime(timeStamp * 1000);
+				var y = date.getFullYear();
+				var m = date.getMonth() + 1;
+				m = m < 10 ? ('0' + m) : m;
+				var d = date.getDate();
+				d = d < 10 ? ('0' + d) : d;
+				var h = date.getHours();
+				h = h < 10 ? ('0' + h) : h;
+				var minute = date.getMinutes();
+				var second = date.getSeconds();
+				minute = minute < 10 ? ('0' + minute) : minute;
+				second = second < 10 ? ('0' + second) : second;
+
+				if(showType == 0) {
+					return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+				} else if(showType == 1) {
+					return h + ':' + minute + ':' + second;
+				} else if(showType == 2) {
+					return y + '-' + m + '-' + d;
+				} else if(showType == 3) {
+					return m + '-' + d;
+				} else if(showType == 4) {
+					return d;
+				} else if(showType == 5) {
+					return m + '-' + d + ' ' + h + ':' + m;
+				} else if(showType == 6) {
+					return h + ':' + m;
+				} else if(showType == 7) {
+					return h;
+				} else {
+					return y + '-' + m + '-' + d;;
+				}
+			}
+
+			function getTimeStringWithTimeStemp(tempStr) {
+
+				var timeStempType = typeof tempStr;
+				var currentDate = new Date;
+				currentDate = currentDate.getTime() / 1000.0;
+				if(timeStempType == "number") {
+					tempStr = tempStr / 1000.0;
+					var timeAgoInterval = currentDate - tempStr;
+					var msgDay = formatDateTime(tempStr, 4);
+					var curDay = formatDateTime(currentDate, 4);
+					
+					if(timeAgoInterval < 60.0) {
+						return "刚刚";
+					} else if(timeAgoInterval >= 60.0 && timeAgoInterval < (60 * 60)) {
+
+						var minutes = timeAgoInterval / 60.0;
+						minutes = minutes.toFixed(0);
+						var str = minutes + "分钟前";
+						return str;
+					} else if(timeAgoInterval >= (60 * 60) && curDay == msgDay && timeAgoInterval < (24 * 60 * 60)) {
+						var str = formatDateTime(tempStr, 6);
+						return str;
+					} else {
+						var str = formatDateTime(tempStr, 3);
+						return str;
+					}
+
+					return "未知时间";
+				}
+			}
+			
+			function getValueString (dic) {
+				var unit = dic["unit"];
+				var eventValue = dic["eventValue"];
+				var unit_type = typeof unit ;
+				var eventValue_type = typeof eventValue ;
+				
+				var ss = "";
+				if (unit_type == 'string' && eventValue_type == 'string') {
+					if (unit.length != 0 && eventValue.length != 0) {
+						ss = eventValue + unit;
+					}
+				}
+				
+				return ss;
+			}
+			
+			function makeTableList(dataArray) {
+				var item = "<a href=# class=linkLabel><li><div class=aramType id={{circleType}}><p>{{eventClass}}</p></div><div class=itemInfo><div>设备类型：{{mappingType}}</div><div>报警类型：<span id={{texColorType}}>{{eventType}}</span><span id={{valueColor}}>{{valueText}}</span></div><div>项目归属：{{siteName}}</div></div><div class=more_more><div class=tm>{{msgTime}}</div><div><img src=../img/more.png/></div></div></li></a>";
+				
+				for(var i = 0; i < dataArray.length; i++) {
+					var temDic = dataArray[i];
+					var _item = item;
+					var timeString = getTimeStringWithTimeStemp(temDic["eventTime"]);
+					var valueString = getValueString(temDic);
+					
+					for(var k in temDic) {
+
+						if(k == "eventClass") {
+							_item = _item.replace('{{' + k + '}}', temDic[k]["msg"]);
+							var msgNum = temDic[k]["code"];
+							var msgSpanType = "";
+							var msgBeforeCir = "";
+							var msgValueStrColorId = "";
+							
+							if(msgNum == "1") {
+								msgSpanType = "baojing";
+								msgBeforeCir = "baojing_before";
+								msgValueStrColorId = "jiance_value_baojing";
+							} else if(msgNum == "2") {
+								msgSpanType = "guzhang";
+								msgBeforeCir = "guzhang_before";
+								msgValueStrColorId = "jiance_value_guzhang";
+							}
+							_item = _item.replace('{{' + 'texColorType' + '}}', msgSpanType);
+
+							_item = _item.replace('{{' + 'circleType' + '}}', msgBeforeCir);
+							
+							_item = _item.replace('{{' + "valueColor" + '}}',msgValueStrColorId);
+							
+							_item = _item.replace('{{' + "valueText" + '}}',valueString);
+							
+							
+						} else if(k == "eventTime") {
+							_item = _item.replace('{{' + 'msgTime' + '}}', timeString);
+						} else if (k == "") {
+							
+						} else {
+							_item = _item.replace('{{' + k + '}}', temDic[k]);
+						}
+					}
+					docStr += _item;
+				}
+				docList.innerHTML = docStr;
+			};
+			//todo get data
+
+			dataSource();
+
+			function dataSource() {
+				
+				if (requesting == true) {
+					return ;
+				}
+				
+				requesting = true;
+				
+				var _messageUrl = messageUrl ;
+				
+			    _messageUrl = _messageUrl.replace('{{' + 'page' + '}}', lastId);
+				
+				if(lastId.length == 0) {
+					docuStr = '';
+					listDataArr.length = 0;
+				}
+				
+				$.ajax({
+					type: "get",
+					url: _messageUrl,
+					dataType: "json",
+					async: true,
+					success: function(res) {
+						requesting = false;
+						if(res.results) {
+							var dataArr = res.results;
+
+							if(dataArr.length > 0) {
+								listDataArr = listDataArr.concat(dataArr);
+								var lastIndx = listDataArr.length - 1;
+								lastId = listDataArr[lastIndx]["handleId"];
+								
+								makeTableList(dataArr);
+							}
+
+							pagesEvent(dataArr);
+
+						} else {
+							//接收到了非约定格式的数据
+							console.log('数组为空，或数组长度=0，或根本不是数组');
+							console.log(res);
+						}
+
+					},
+					error: function(err) {
+						requesting = false;
+						console.log(err);
+					}
+				});
+			};
+
+			function pagesEvent(dataArr) {
+
+				if(dataArr.length < pageSize) {
+					$('.loadNextPage').html('没有更多数据了');
+
+				} else {
+					$('.loadNextPage').html('加载更多');
+
+				}
+
+			}
+		</script>
+
+	</body>
+
+</html>

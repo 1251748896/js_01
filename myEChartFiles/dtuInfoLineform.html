@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		
+		<script type="text/javascript" src="echarts.min.js"></script>
+		<script type="text/javascript" src="jquery.min.js"></script>
+		
+		<style>
+			.dtuInfoDiv table{
+				padding-top: 10px;
+				padding-left: 5px;
+				padding-right: 5px;
+				padding-bottom: 30px;
+			}
+			
+			.dtuInfoDiv td{
+				width: 100px;
+				height: 32px;
+				background-color: #f0f0f0;
+				font-size: 15px;
+				border: 0px solid #ffffff;
+				color: #333333;
+				text-align: center;
+			}
+			/*
+			 * 1.告警类型的class：alarm
+			 * 2.故障class：fault
+			 * 3.正常class：normal
+			 * 
+			 * 
+			 * */
+			
+			.alarm {
+				width: 100px;
+				height: 32px;
+				background-color: #f0f0f0;
+				font-size: 15px;
+				border: 0px solid #ffffff;
+				color: #FB2929;
+				text-align: center;
+			}
+			.fault {
+				width: 100px;
+				height: 32px;
+				background-color: #f0f0f0;
+				font-size: 15px;
+				border: 0px solid #ffffff;
+				color: #FB8229;
+				text-align: center;
+			}
+			.normal {
+				width: 100px;
+				height: 32px;
+				background-color: #f0f0f0;
+				font-size: 15px;
+				border: 0px solid #ffffff;
+				color: #3CCB3E;
+				text-align: center;
+			}
+			.mesurement {
+				width: 100px;
+				height: 32px;
+				background-color: #f0f0f0;
+				font-size: 15px;
+				border: 0px solid #ffffff;
+				color: #333333;
+				text-align: center;
+			}
+			
+			
+		</style>
+		
+	</head>
+	<body>
+		<div class="dtuInfoDiv">
+			
+			<table id="dtulist">
+				<tr><td class="mesurement">电流</td><td class="{{msgType}}">通道1:5A</td></tr>
+				
+			</table>
+			
+		</div>
+		
+		<script type="text/javascript">
+			
+			function getChangelType (dic) {
+				
+				var alertStatus = dic["alertStatus"];
+				var faultStatus = dic["faultStatus"];
+				var currentValue = dic["currentValue"];
+				
+				if (alertStatus.length != 0 && alertStatus != "0") {
+					//显示告警文字或告警值
+					return "alarm";
+				} else if (faultStatus.length != 0 && faultStatus != "0") {
+					//显示故障文字或故障值
+					return "fault";
+				}  else {
+					//显示正常文字
+					return "normal";
+				}
+			}
+			
+			function getChangelValue (dic) {
+				
+				var alertStatus = dic["alertStatus"];
+				var faultStatus = dic["faultStatus"];
+				var currentValue = dic["currentValue"];
+				var channelAlias = dic["channelAlias"];
+				var channel = dic["channel"];
+								
+				var toStr = channelAlias;
+				var x = typeof channelAlias;
+				if (x != "string" || channelAlias.length == 0) {
+					toStr = "通道" + channel;
+				}
+				
+				if (alertStatus.length != 0 && alertStatus != "0") {
+					//显示告警文字或告警值
+					if (currentValue > 0) {
+						return toStr + ":" + currentValue ;
+					}
+					return toStr + ":" + alertStatus ;
+				} else if (faultStatus.length != 0 && faultStatus != "0") {
+					//显示故障文字或故障值
+					if (currentValue > 0) {	
+						return toStr + ":" + currentValue ;
+					}
+					return toStr + ":" + faultStatus ;
+				}  else {
+					//显示正常文字
+					if (currentValue > 0) {
+						return toStr + ":" + currentValue ;
+					}
+					return toStr + ":" + "正常" ;
+				}
+			}
+			
+			var tableList = document.getElementById("dtulist");
+			
+			var tdStr = "<td class={{msgType}}>{{msgValue}}</td>";
+			var docuStr = "";
+			function makeTableList(dataArray) {
+				
+				for (var i = 0; i < dataArray.length; i++) {
+					
+					var tempDic = dataArray[i];
+					
+					var _tdStr = tdStr; 
+					
+					var unitName = tempDic["unitName"];
+					var sensorInfos = tempDic["sensorInfos"];
+					_tdStr = _tdStr.replace("{{" + "msgType" + "}}","mesurement");
+					_tdStr = _tdStr.replace("{{" + "msgValue" + "}}",unitName);
+					
+					var xxxxx = "";
+					for (var j = 0; j < sensorInfos.length; j++) {
+						var valueTdStr = tdStr;
+						var valueDict = sensorInfos[j];
+						var v = getChangelValue(valueDict);
+						var t = getChangelType(valueDict);
+						
+						valueTdStr = valueTdStr.replace("{{" + "msgType" + "}}",t);
+						valueTdStr = valueTdStr.replace("{{" + "msgValue" + "}}",v);
+						
+						xxxxx += valueTdStr;
+					}
+					
+					_tdStr += xxxxx;
+					var x = "<tr>" + _tdStr + "</tr>";
+					docuStr += x;
+				}
+				
+				tableList.innerHTML = docuStr;
+			}
+			
+			//获取数据
+			var baseUrl = "http://183.220.115.100:8888/";
+			var myUrl = "api/device/sensors";
+			var appToken = "39b3332a-b131-44eb-bfba-246cfba3a66c";
+			var hardwareId = "8655330302676490";
+			
+			var param = "?token="+appToken+"&hardwareId="+hardwareId;
+			var requestUrl = baseUrl+myUrl+param;
+			
+			getHistorydata();
+			
+			function getHistorydata() {
+				$.ajax({
+					type:"GET",
+					url:requestUrl,
+					dataType:"json",
+					async:true,
+					success:function(res) {
+						
+						makeTableList(res.results);
+					},
+					error:function(err) {
+						console.log(err);
+					}
+				})	
+			}
+		</script>
+		
+	</body>
+</html>

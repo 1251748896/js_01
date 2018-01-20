@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<meta charset="UTF-8">
+		<title>首页</title>
+		<script src="jquery.min.js"></script>
+		<script type="text/javascript" src="echarts.min.js"></script>
+		<script type="text/javascript" src="Tools.js"></script>
+		<link rel="stylesheet" href="Main.css" />
+		<script type="text/javascript" src="Main.js"></script>
+
+	</head>
+
+	<body>
+		<!--
+        	banner部分
+        -->
+		<div id="banner">
+			<div class="bg_div">
+				<img class="bg_img_1" src="../img/main_top_bg.png" />
+				<h3 id="top_title">设备在线率</h3>
+				<div id="top_left">
+					<h5 id="online_left">在线设备：<span id="onlineCount">0个</span></h5>
+					<h5 id="offline_left">离线设备：<span id="offlineCount">0个</span></h5>
+				</div>
+				<div id="main_chart_circle"></div>
+			</div>
+			<div class="bg_div">
+				<img class="bg_img_1" src="../img/main_top_bg.png" />
+				<div id="notice_shadow">
+					<h3 id="notice_title"></h3>
+					<p id="niotice_content"></p>
+					<div id="notice_time"></div>
+				</div>
+			</div>
+		</div>
+
+		<!--
+        	灰色线
+        -->
+		<hr class="gayLine_10" />
+		<!--
+        	系统部分
+        -->
+		<div id="system_bg_div">
+			<a class="system_item_div" href="#">
+				<img src="../img/火灾自动报警_H.png" />
+				<p>火灾自动报警</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/气体探测监控_H.png" />
+				<p>气体探测监控</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/电气火灾监控_H.png" />
+				<p>电气火灾监控</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/消防电源监控_H.png" />
+				<p>消防电源监控</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/水压监控_H.png" />
+				<p>水压监控</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/消火栓监控_H.png" />
+				<p>消火栓监控</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/井盖监控_H.png" />
+				<p>井盖监控</p>
+			</a>
+			<a class="system_item_div" href="#">
+				<img src="../img/防火门监控_H.png" />
+				<p>防火门监控</p>
+			</a>
+
+		</div>
+
+		<!--
+        	消息列表
+        -->
+		<hr class="gayLine_10" />
+
+		<div id="message_list_header">
+			<span id="messahe_header_left">报警列表</span>
+			<a href="#" id="messahe_header_right">更多 >></a>
+		</div>
+
+		<ul id="message_list_ul">
+			
+			<li class="main_cell_alarm main_cell_fault">
+				<a href="#">
+					<div class="cell_top">
+						<span class="dev_name">电压电流传感器</span>
+						<span class="message_time">01-19</span>
+					</div>
+					<div class="cell_bottom">
+						<span class="alert_type">报警类型：<span class="alert_type_color">供电中断</span></span>
+					</div>
+				</a>
+			</li>
+		</ul>
+
+	</body>
+
+</html>
