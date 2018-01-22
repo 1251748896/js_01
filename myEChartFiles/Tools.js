@@ -90,6 +90,7 @@ function getAddrWithLevelDict (addrDict) {
 	var str = "";
 	
 	var eleType = typeof addrDict;
+	
 	if (eleType == "object") {
 		
 		var dic = addrDict.parseJSON();
@@ -105,12 +106,15 @@ function getAddrWithLevelDict (addrDict) {
 	} else if (eleType == "string") {
 		
 		var dic = JSON.parse(addrDict);
+		
 		var i = 0;
 		for (var k in dic) {
 			var indx = i + 1;
 			var level = "level" + indx.toString();
+			
 			var v = dic[level];
 			var vt = typeof v;
+			
 			if (vt == "string") {
 				str += v;
 			}
@@ -127,7 +131,7 @@ function getAddrWithLevelDict (addrDict) {
  * */
 
 function getUserToken() {
-	return "5a03442b-e179-49a1-b1b4-5ca55be62a5d";
+	return "f2c16e9c-91cf-4678-86c8-ea3996aa47f0";
 }
 
 function getTokenKey () {
@@ -179,3 +183,10 @@ function getSiteGisControllers () {
 	return makeFullUrl("api/siteGis/controllers");
 }
 
+function getDeviceDtu () {
+	return makeFullUrl("api/device/dtu");
+}
+
+function getIndexSites () {
+	return makeFullUrl("api/index/sites");
+}
